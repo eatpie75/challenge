@@ -59,7 +59,11 @@ router.get('/challenge/user', requires_login, function(req, res) {
  * Endpoint to get a list of public challenges
  */
 router.get('/challenge/public', function(req, res) {
-  // var data = req.db.Challenge.publicList();
+  // var query = {
+  //   'limit': 10
+  // };
+  // 
+  // var data = req.db.Challenge.findAll(query);
 
   var data = require('../specs/server/mock_challenge_list.json');
 
