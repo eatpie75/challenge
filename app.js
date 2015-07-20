@@ -4,12 +4,14 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+
 
 var routes = require('./routes/index');
 var api = require('./routes/api');
 var auth = require('./routes/auth');
 
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 var passport = require('./middleware/passport');
 
 var app = express();
@@ -21,6 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
+  'store': new FileStore,
   'secret': 'all along the watchtower',
   'resave': false,
   'saveUninitialized': false

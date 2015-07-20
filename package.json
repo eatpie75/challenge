@@ -24,6 +24,7 @@
     "passport-facebook": "~2.0",
     "sequelize": "~3.4",
     "serve-favicon": "~2.3",
+    "session-file-store": "0.0.14",
     "sqlite3": "^3.0.9"
   },
   "devDependencies": {

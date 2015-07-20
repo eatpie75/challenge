@@ -8,3 +8,5 @@ public/lib/*.js
 /facebook_config.js
 
 npm-debug.log
+
+sessions/

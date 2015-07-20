@@ -4,7 +4,7 @@ GET /user_info
 * Requires authentication
 * No arguments
 * User is determined by session
-* Returns {'first_name', 'last_name', 'profile_image'}
+* Returns {'id', first_name', 'last_name', 'email'}
 
 
 GET /challenge/:id
