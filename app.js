@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-  'store': new FileStore,
+  'store': new FileStore(),
   'secret': 'all along the watchtower',
   'resave': false,
   'saveUninitialized': false
