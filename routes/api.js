@@ -38,7 +38,7 @@ var prepare_challenge_data = function(challenge) {
     'message': challenge.message,
     'url': challenge.url_id,
     'creator': challenge.creator,
-    'started': challenge.creator,
+    'started': challenge.started,
     'complete': challenge.complete,
     'winner': challenge.winner,
     'date_created': challenge.createdAt,
