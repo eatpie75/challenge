@@ -36,7 +36,7 @@ router.get('/facebook/callback', passport.authenticate('facebook'), function(req
 
   models.Challenge.count(query).then(function(count) {
     if (count > 0) {
-      res.redirect('/#/challenge');
+      res.redirect('/#/user');
     } else {
       res.redirect('/#/challenge/public');
     }
