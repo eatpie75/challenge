@@ -95,6 +95,7 @@ Challenge.belongsToMany(User, {
   as: 'participants'
 });
 
+UserChallenge.belongsTo(User);
 
 // make the database
 // delete database file to clear database
