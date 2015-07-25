@@ -1,0 +1,39 @@
+<div class="challenge-creator-container" ng-show="user.id===creator.id">
+  <button type="button" class="btn btn-default" ng-hide="started" ng-click="challengeStart()">Start challenge</button>
+  <button type="button" class="btn btn-danger" ng-hide="!started||complete" ng-click="challengeComplete()">Complete challenge with no winner</button>
+</div>
+
+<div class="challenge-participant-container" ng-show="isParticipant&&!hasAccepted&&user.id!==creator.id">
+  <button type="button" class="btn btn-success" ng-click="challengeAccept()">Accept challenge</button>
+  <!-- <button type="button" class="btn btn-danger" ng-click="challengeComplete()">Deny challenge</button> -->
+</div>
+
+<div class="challenge-info-container">
+  <div class="challenge-details">
+    <div class="challenge-creator pull-right">
+      <h4 class="text-center">Creator info</h4>
+      <img class="pull-left" ng-src="{{creator.profile_image}}">
+      <span class="challenge-creator-name">
+        {{creator.first_name}} {{creator.last_name}}
+      </span>
+      <br>
+      <span class="challenge-creator-info">
+        HOT STATS
+      </span>
+    </div>
+    <h1 class="challengeTitle">{{ challengeData.title }}</h1>
+    <p class="lead challengeDescription">{{ challengeData.message }}</p>
+    <p class="text-danger" ng-show="complete&&winner===null">NOBODY WINS</p>
+    <p class="text-success" ng-show="complete&&winner!==null">
+      {{winner.first_name|uppercase}} {{winner.last_name|uppercase}} IS THE WINNER
+    </p>
+  </div>
+  <div class="challenge-participants">
+    <div class="challenge-participants-item" ng-repeat="participant in challengeData.participants">
+      <img ng-src="{{participant.profile_image}}" title="{{participant.first_name}} {{participant.last_name}}">
+      <span class="glyphicon glyphicon-sunglasses text-muted" title="Declare them the winner"
+      ng-hide="!started||complete" ng-click="challengeComplete(participant.id)">
+      </span>
+    </div>
+  </div>
+</div>

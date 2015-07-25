@@ -16,3 +16,16 @@
 .challenge-participant-list > a > img {
   height: 20px;
 }
+
+.challenge-details .challenge-creator > img {
+  height: 40px;
+}
+
+.challenge-participants-item > img {
+  height: 50px;
+}
+
+.challenge-participants-item > span {
+  font-size: 2em;
+  cursor: pointer;
+}
