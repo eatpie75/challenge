@@ -1,7 +1,7 @@
   <table class='table table-bordered challenge-table'>
     <caption>{{caption}}</caption>
     <tr ng-repeat='challenge in challenges|challengeFilter:accepted:started:complete:user' class='challenge-row'>
-      <td><a ui-sref='challenge({challengeId:challenge.id})'>{{challenge.title}}</a></td>
+      <td><a ui-sref='challenge_view({id:challenge.id})'>{{challenge.title}}</a></td>
       <td class='challenge-participant-list'>
         <a ng-repeat='participant in challenge.participants' ui-sref='user({userId:participant.id})'>
           <img ng-src='{{participant.profile_image}}' title='{{participant.first_name}} {{participant.last_name}}'> 
@@ -9,3 +9,4 @@
       </td>
     </tr>
   </table>
+  
