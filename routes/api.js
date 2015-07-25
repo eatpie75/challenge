@@ -6,14 +6,11 @@ var models = require('../models');
  * Check if user is logged in and return an error otherwise
  */
 var requires_login = function(req, res, next) {
-  // if (!req.isAuthenticated()) {
-  //     res.status(401).json({'error': 'ENOTAUTH', 'message':'Endpoint requires login.'});
-  //   } else {
-  //     next();
-  //   }
-
-  // Disabled for now
-  next();
+  if (!req.isAuthenticated()) {
+    res.status(401).json({'error': 'ENOTAUTH', 'message':'Endpoint requires login.'});
+  } else {
+    next();
+  }
 };
 
 
@@ -23,71 +20,66 @@ var requires_login = function(req, res, next) {
  * Requires login
  */
 router.get('/user_info', requires_login, function(req, res) {
+  var data = {
+    'id': req.user.id,
+    'first_name': req.user.first_name,
+    'last_name': req.user.last_name,
+    'email' : req.user.email,
+    'profile_image': '/img/placeholder.jpg'
+  };
 
-  models.User.findOne({
-    where: {
-      id: req.user.id
-    }
-  })
-  .then(function(user) {
-    res.json(user.get({plain: true}));
+  res.json(data);
+});
+
+router.get('/user_search', requires_login, function(req, res) {
+  models.User.findAll().then(function(users) {
+    var data = [];
+    users.forEach(function(user) {
+      data.push({
+        'id': user.id,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email' : user.email,
+        'profile_image': '/img/placeholder.jpg'
+      });
+    });
+    
+    res.json(data);
+  });
+});
+
+
+var prepare_challenge_data = function(challenge) {
+  var data = {
+    'id': challenge.id,
+    'title': challenge.title,
+    'message': challenge.message,
+    'wager': challenge.wager || '',
+    'url': challenge.url_id,
+    'creator': challenge.creator,
+    'started': challenge.started,
+    'complete': challenge.complete,
+    'winner': challenge.winner,
+    'date_created': challenge.createdAt,
+    'date_started': challenge.date_started,
+    'date_completed': challenge.date_completed,
+    'participants': []
+  };
+
+  if (!challenge.participants) return data;
+
+  challenge.participants.forEach(function(participant) {
+    data.participants.push({
+      'id': participant.id,
+      'first_name': participant.first_name,
+      'last_name': participant.last_name,
+      'accepted': participant.usersChallenges.accepted,
+      'profile_image': '/img/placeholder.jpg'
+    });
   });
 
-  //Mock data
-  // var data = {
-  //   'id': 1,
-  //   'first_name': 'Randy',
-  //   'last_name': 'Savage',
-  //   'profile_image' : 'http://img.bleacherreport.net/img/images/photos/001/866/715/randy_savage_crop_north.png?w=377&h=251&q=75',
-  // };
-
-  // res.json(data);
-});
-
-
-/**
- * Endpoint to get a list of all users
- */
-router.get('/allUsers', function(req, res) {
-
-  models.User.findAll()
-    .then(function(users) {
-      var data = [];
-      for(var i = 0; i < users.length; i++) {
-        data.push({
-          id: users[i].get('id'),
-          first_name: users[i].get('first_name'),
-          last_name: users[i].get('last_name'),
-          email: users[i].get('email'),
-          fb_id: users[i].get('fb_id'),
-          createdAt: users[i].get('createdAt'),
-          updatedAt: users[i].get('updatedAt')
-        });
-      }
-
-      res.json(data);
-    })
-    .catch(function(err) {
-      throw new Error('Failed to GET at /allUsers route: ', err);
-    });
-
-  // Mock data
-  // var data = [{
-  //       "id": 1,
-  //       "first_name": "Randy",
-  //       "last_name": "Savage",
-  //       "profile_image" : "http://img.bleacherreport.net/img/images/photos/001/866/715/randy_savage_crop_north.png?w=377&h=251&q=75"
-  //     },
-  //     {
-  //       "id": 2,
-  //       "first_name": "Paul",
-  //       "last_name": "Newman",
-  //       "profile_image" : "http://i.dailymail.co.uk/i/pix/2008/09/28/article-1063705-02D517F700000578-321_468x524.jpg"
-  //     }];
-
-  // res.json(data);
-});
-
+  return data;
+};
 
 /**
  * Endpoint to get a list of challenges associated with currently logged in user
@@ -95,19 +87,52 @@ router.get('/allUsers', function(req, res) {
  * Requires login
  */
 router.get('/challenge/user', requires_login, function(req, res) {
-  // var data = req.db.Challenge.findByUser(req.user.id);
+  var query = {
+    'limit': 50,
+  };
 
-  models.User.findOne({where: {id: req.user.id}})
-  .then(function(user) {
-    user.getChallenges()
-      .then(function(challenges) {
-        res.json(challenges);
+  models.Challenge.findAll(query).then(function(challenges) {
+    var data = [];
+    var challenge_id_list = challenges.map(function(challenge) {return challenge.id;});
+
+    models.UserChallenge.findAll({
+      'where': {
+        'challengeId': {
+          '$in': challenge_id_list
+        }
+      },
+      'include': {
+        'model': models.User
+      }
+    }).then(function(users) {
+      var participants = {};
+      challenge_id_list.forEach(function(id) {
+        if (participants[id] === undefined) participants[id] = [];
+        users.forEach(function(user) {
+          if (user.challengeId === id) {
+            participants[id].push(user);
+          }
+        });
       });
+      challenges.forEach(function(challenge) {
+        var tmp = prepare_challenge_data(challenge);
+
+        participants[challenge.id].forEach(function(participant) {
+          tmp.participants.push({
+            'id': participant.user.id,
+            'first_name': participant.user.first_name,
+            'last_name': participant.user.last_name,
+            'accepted': participant.accepted,
+            'profile_image': '/img/placeholder.jpg'
+          });
+        });
+
+        data.push(tmp);
+      });
+
+      res.json(data);
+    });
   });
-
-  // var data = require('../specs/server/mock_challenge_list.json');
-
-  // res.json(data);
 });
 
 
@@ -115,35 +140,23 @@ router.get('/challenge/user', requires_login, function(req, res) {
  * Endpoint to get a list of public challenges
  */
 router.get('/challenge/public', function(req, res) {
-  // var data = req.db.Challenge.publicList();
+  var query = {
+    'limit': 10,
+    'include': {
+      'model': models.User,
+      'as': 'participants'
+    }
+  };
 
-  // var data = require('../specs/server/mock_challenge_list.json');
+  models.Challenge.findAll(query).then(function(challenges) {
+    var data = [];
 
-  // res.json(data);
-
-  models.Challenge.findAll({ limit: 10 , order: [['createdAt', 'DESC']]}) // must pass an array of tuples
-    .then(function(challenges) {
-      var data = [];
-      for(var i = 0; i < challenges.length; i++) {
-        data.push({
-          id: challenges[i].get('id'),
-          title: challenges[i].get('title'),
-          message: challenges[i].get('message'),
-          wager: challenges[i].get('wager'),
-          creator: challenges[i].get('creator'),
-          winner:  challenges[i].get('winner'),
-          complete: challenges[i].get('complete'),
-          started: challenges[i].get('started'),
-          createdAt: challenges[i].get('createdAt'),
-          updatedAt: challenges[i].get('updatedAt')
-        });
-      }
-
-      res.json(data);
-    })
-    .catch(function(err) {
-      throw new Error('Failed to GET at /challenge/public route: ', err);
+    challenges.forEach(function(challenge) {
+      data.push(prepare_challenge_data(challenge));
     });
+
+    res.json(data);
+  });
 });
 
 
@@ -152,37 +165,17 @@ router.get('/challenge/public', function(req, res) {
  */
 router.get('/challenge/:id', function(req, res) {
   var target_id = parseInt(req.params.id);
-  // var data = req.db.Challenge.findById(req.params.id);
+  
+  var query = {
+    'include': {
+      'model': models.User,
+      'as': 'participants'
+    }
+  };
 
-  models.Challenge.findOne({where: {id: target_id}})
-    .then(function(challenge) {
-      res.json({
-        id: challenge.get('id'),
-        title: challenge.get('title'),
-        message: challenge.get('message'),
-        wager: challenge.get('wager'),
-        creator: challenge.get('creator'),
-        winner: challenge.get('winner'),
-        complete: challenge.get('complete'),
-        started: challenge.get('started'),
-        createdAt: challenge.get('createdAt'),
-        updatedAt: challenge.get('updatedAt')
-      });
-    });
-
-  // var data;
-  // require('../specs/server/mock_challenge_list.json').forEach(function(challenge) {
-  //   if(challenge.id === target_id) {
-  //     data = challenge;
-  //     return;
-  //   }
-  // });
-  // if (data === undefined) {
-  //   res.status(400);
-  //   data = {'error': 'ENOTFOUND', 'message': 'Could not find challenge with the id: ' + target_id};
-  // }
-
-  // res.json(data);
+  models.Challenge.findById(target_id, query).then(function(challenge) {
+    res.json(prepare_challenge_data(challenge));
+  });
 });
 
 
@@ -211,57 +204,40 @@ var challenge_form_is_valid = function(form) {
  */
 router.post('/challenge', requires_login, function(req, res) {
   var form = req.body;
+  var participants = (req.body.participants !== undefined) ? req.body.participants : [];
+  var challenge_id;
 
-  // validate form
   if (!challenge_form_is_valid(form)) {
     res.status(400).json({'error': 'EINVALID', 'message': 'Submitted form is invalid.'});
     return;
   }
 
-  // Create the challenge
   models.Challenge.create({
-    title: form.title,
-    message: form.message,
-    wager: form.wager,
-    creator: req.user.id,
-    date_started: Date.now()
-  })
-  .then(function(challenge) {
-    challenge.addParticipants(form.participants); // form.participants should be an array
-    challenge.addParticipant([req.user.id], {accepted: true}); // links creator of challenge
-
-    res.status(201).json({
-      id: challenge.id
+    'title': form.title,
+    'message': form.message,
+    'wager': (form.wager !== undefined) ? form.wager : '',
+    'creator': req.user.id
+  }).then(function(instance) {
+    challenge_id = instance.id;
+    return instance.addParticipant(req.user.id, {'accepted':true}).then(function() {
+      return instance.addParticipants(participants);
     });
+  }, function(error) {
+    res.status(500).json({'error': 'EUNKNOWN', 'message': 'Challenge could not be created'});
+  }).then(function() {
+    var query = {
+      'include': {
+        'model': models.User,
+        'as': 'participants'
+      }
+    };
+
+    return models.Challenge.findById(challenge_id, query);
+  }).then(function(challenge) {
+    var data = prepare_challenge_data(challenge);
+
+    res.status(201).json(data);
   });
-
-   // TODO: add catch statements to handle errors
-
-  // req.db.Challenge.create({
-  //   'title': form.title,
-  //   'message': form.message,
-  //   'wager': (form.wager !== undefined) ? form.wager : '',
-  //   'creator': req.user.id
-  // }).then(function(instance) {
-  //   res.status(201).json({
-  //     'id': instance.id,
-  //     'title': instance.title,
-  //     'message': instance.message,
-  //     'wager': instance.wager,
-  //     'url': instance.get_url()
-  //   });
-  // }, function(error) {
-  //   res.status(500).json({'error': 'EUNKNOWN', 'message': 'Challenge could not be created'});
-  // });
-
-
-  // res.status(201).json({
-  //   'id': 4,
-  //   'title': form.title,
-  //   'message': form.message,
-  //   'wager': form.wager || '',
-  //   'url': '/challenge/4'
-  // });
 });
 
 
@@ -272,57 +248,26 @@ router.post('/challenge', requires_login, function(req, res) {
  */
 router.put('/challenge/:id/started', requires_login, function(req, res) {
   var target_id = parseInt(req.params.id);
-  var user_id = req.user.id;
-  //for testing
-  // var target_id = 2;
-  // var user_id = 1;
 
-  models.Challenge.update({
-    started: true,
-    date_started: Date.now()
-  }, {
-    where: {
-      id: target_id,
-      creator: user_id,
-      started: false,
-      complete: false
+  var query = {
+    'where': {
+      'id': target_id,
+      'creator': req.user.id,
+      'started': false
     }
-  }).then(function() {
-    models.Challenge.findOne({where: {id: target_id}})
-    .then(function(challenge) {
-      if (challenge.get('started')) {
-        res.status(201).json({'success': true});
-      } else {
-        res.status(200).json({'success': false});
-      }
+  };
+
+  models.Challenge.find(query).then(function(challenge) {
+    if (challenge === null) {
+      res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
+      return;
+    }
+    challenge.started = true;
+    challenge.date_started = Date.now();
+    challenge.save().then(function() {
+      res.json({'success':true});
     });
   });
-  // var query = {
-  //   'where': {
-  //     'id': target_id,
-  //     'creator': req.user,
-  //     'started': false
-  //   }
-  // };
-
-  // req.db.Challenge.find(query).then(function(challenge) {
-  //   challenge.started = true;
-  //   challenge.date_started = Date.now();
-  //   challenge.save().then(function() {
-  //     res.json({'success':true});
-  //   });
-  // }, function(error) {
-  //   res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
-  // });
-
-  // var found = require('../specs/server/mock_challenge_list.json').some(function(challenge) {
-  //   return (challenge.id === target_id && !challenge.started);
-  // });
-  // if (!found) {
-  //   res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
-  // } else {
-  //   res.json({'success': true});
-  // }
 });
 
 
@@ -334,138 +279,53 @@ router.put('/challenge/:id/started', requires_login, function(req, res) {
 router.put('/challenge/:id/complete', requires_login, function(req, res) {
   var target_id = parseInt(req.params.id);
   var winner = parseInt(req.body.winner);
-  //for testing
-  // var target_id = 2;
-  // var winner = 1;
-  // var userID = 1;
+  winner = (!Number.isNaN(winner)) ? winner : null;
 
-  models.Challenge.update({
-    winner: winner,
-    complete: true
-  }, {
-    where: {
-      id: target_id,
-      creator: req.user.id,
-      started: true,
-      complete: false
+  var query = {
+    'where': {
+      'id': target_id,
+      'creator': req.user.id,
+      'started': true,
+      'complete': false
     }
-  }).then(function() {
-    models.Challenge.findOne({where: {id: target_id}})
-    .then(function(challenge) {
-      if (challenge.get('complete')) {
-        res.status(201).json({'success': true});
-      } else {
-        res.status(200).json({'success': false});
-      }
+  };
+
+  models.Challenge.find(query).then(function(challenge) {
+    if (challenge === null) {
+      res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
+      return;
+    }
+    challenge.complete = true;
+    challenge.winner = winner;
+    challenge.date_completed = Date.now();
+    challenge.save().then(function() {
+      res.json({'success':true});
     });
   });
-
-  // var query = {
-  //   'where': {
-  //     'id': target_id,
-  //     'creator': req.user.id,
-  //     'started': true,
-  //     'complete': false
-  //   }
-  // };
-
-  // req.db.Challenge.find(query).then(function(challenge) {
-  //   challenge.complete = true;
-  //   challenge.winner = winner;
-  //   challenge.date_completed = Date.now();
-  //   challenge.save().then(function() {
-  //     res.json({'success':true});
-  //   });
-  // }, function(error) {
-  //   res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
-  // });
-
-  // var found = require('../specs/server/mock_challenge_list.json').some(function(challenge) {
-  //   return (challenge.id === target_id && challenge.started && !challenge.complete);
-  // });
-  // if (!found) {
-  //   res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
-  // } else {
-  //   res.json({'success': true});
-  // }
 });
+
 
 router.put('/challenge/:id/accept', requires_login, function(req, res) {
   var target_id = parseInt(req.params.id);
-  var user_id = req.user.id;
-  //for testing
-  // var target_id = 2;
-  // var user_id = 2;
-
-  models.UserChallenge.update({
-    accepted: true
-  }, {
-    where: {
-      challengeId: target_id,
-      userId: user_id,
-      accepted: false
+  
+  var query = {
+    'where': {
+      'challengeId': target_id,
+      'userId': req.user.id,
+      'accepted': false
     }
-  }).then(function() {
-    models.UserChallenge.findOne({
-      where: {
-        challengeId: target_id,
-        userId: user_id
-      }
-    })
-    .then(function(userChallenge) {
-      if (userChallenge.get('accepted')) {
-        res.status(201).json({'success': true});
-      } else {
-        res.status(200).json({'success': false});
-      }
+  };
+
+  models.UserChallenge.find(query).then(function(user_challenge) {
+    if (user_challenge === null) {
+      res.status(400).json({'error': 'ENOTFOUND', 'message': 'Could not find appropriate challenge with the id: ' + target_id});
+      return;
+    }
+    user_challenge.accepted = true;
+    user_challenge.save().then(function() {
+      res.json({'success': true});
     });
   });
-
-  // var user_id = req.user.id;
-  //
-  // var query = {
-  //   'where': {
-  //     'ChallengeId': target_id,
-  //     'UserId': req.user.id,
-  //     'accepted': false
-  //   }
-  // };
-
-  // req.db.UserChallenge.find(query).then(function(user_challenge) {
-  //   user_challenge.accepted = true;
-  //   user_challenge.save().then(function() {
-  //     res.json({'success': true});
-  //   });
-  // }, function(error) {
-  //   res.status(400).json({'error': 'ENOTFOUND', 'message': 'User not part of challenge or already accepted'});
-  // });
-
-
-  // var user_id = 1;
-  // var data;
-  // require('../specs/server/mock_challenge_list.json').forEach(function(challenge) {
-  //   if(challenge.id === target_id && !challenge.started) {
-  //     data = challenge;
-  //     return;
-  //   }
-  // });
-  // if (data === undefined) {
-  //   res.status(400).json({'error': 'ENOTFOUND', 'message': 'User not part of challenge or already accepted'});
-  // } else {
-  //   var found = false;
-  //   data.participants.forEach(function(user) {
-  //     if (user.id === user_id && !user.accepted) {
-  //       found = true;
-  //       return;
-  //     }
-  //   });
-
-  //   if (!found) {
-  //     res.status(400).json({'error': 'ENOTFOUND', 'message': 'User not part of challenge or already accepted'});
-  //   } else {
-  //     res.json({'success': true});
-  //   }
-  // }
 });
 
 
