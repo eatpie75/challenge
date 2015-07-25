@@ -51,6 +51,17 @@ angular.module('challengeApp.services', [])
     });
   };
 
+  var challengeComplete = function(challengeId, winnerId) {
+    console.log(winnerId);
+    return $http({
+      method: 'PUT',
+      url: '/api/1/challenge/' + challengeId + '/complete',
+      data: (winnerId !== undefined) ? {'winner': parseInt(winnerId)} : {}
+    }).then(function(resp) {
+      return resp.data;
+    });
+  };
+
   var getUserChallenges = function() {
     return $http({
       method: 'GET',
@@ -65,6 +76,7 @@ angular.module('challengeApp.services', [])
     getChallengeInfo: getChallengeInfo,
     acceptChallenge: acceptChallenge,
     challengeStart: challengeStart,
+    challengeComplete: challengeComplete,
     getUserChallenges: getUserChallenges
   };
 })
