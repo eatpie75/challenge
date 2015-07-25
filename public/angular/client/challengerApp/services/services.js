@@ -2,8 +2,8 @@ angular.module('challengeApp.services', [])
 
 .factory('Auth', function ($http) {
   var getUserInfo = function() {
-    return $http.get('/api/1/user_info').then(function(data) {
-      return data.data;
+    return $http.get('/api/1/user_info').then(function(res) {
+      return res.data;
     }, function(error) {
       throw Error(error);
     });
@@ -29,7 +29,6 @@ angular.module('challengeApp.services', [])
       method: 'GET',
       url: '/api/1/challenge/' +  challengeId,
     }).then(function(resp){
-      console.log("this is resp", resp);
       return resp.data;
     });
   };
@@ -39,16 +38,16 @@ angular.module('challengeApp.services', [])
       method: 'PUT',
       url: '/api/1/challenge/' + challengeId + '/accept',
     }).then(function(resp){
-      console.log("challenge has been accepted, resp");
+      return resp.data;
     });
   };
 
-  var challengeCompleted = function(challengeId) {
+  var challengeStart = function(challengeId) {
     return $http({
       method: 'PUT',
-      url: '/api/1/challenge/' + challengeId + '/accept',
+      url: '/api/1/challenge/' + challengeId + '/started',
     }).then(function(resp) {
-      console.log("challenge completed", resp);
+      return resp.data;
     });
   };
 
@@ -65,7 +64,7 @@ angular.module('challengeApp.services', [])
   return {
     getChallengeInfo: getChallengeInfo,
     acceptChallenge: acceptChallenge,
-    challengeCompleted: challengeCompleted,
+    challengeStart: challengeStart,
     getUserChallenges: getUserChallenges
   };
 })
@@ -74,9 +73,8 @@ angular.module('challengeApp.services', [])
   var getAllUsers = function(){
     return $http({
       method: 'GET',
-      url: '/api/1/allUsers',
+      url: '/api/1/user_search',
     }).then(function(resp){
-      console.log("this is the getAllUsers resp", resp);
       return resp.data;
     });
   };
@@ -86,7 +84,6 @@ angular.module('challengeApp.services', [])
       method: 'GET',
       url: '/api/1/user_info',
     }).then(function(resp){
-      console.log("this is the getCreatorInfo resp", resp);
       return resp.data;
     });
   };
@@ -98,12 +95,9 @@ angular.module('challengeApp.services', [])
       url: '/api/1/challenge',
       data: challengeInfo
     }).then(function(resp){
-      console.log("this is the postChallenge resp", resp);
       return resp.data;
     });
   };
-
-
 
   return {
     getAllUsers: getAllUsers,
