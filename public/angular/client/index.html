@@ -21,11 +21,11 @@
 <!-- NAVIGATION -->
 <nav class="navbar navbar-inverse" role="navigation">
     <div class="navbar-header">
-        <a class="navbar-brand" ui-sref="#">AngularUI Router</a>
+        <a class="navbar-brand" ui-sref="challenge_public">DUEL OR SOMETHING</a>
     </div>
     <ul class="nav navbar-nav">
-        <li><a ui-sref="challenge({challengeId:1})">Challenge</a></li>
-        <li><a ui-sref="about">About</a></li>
+        <li><a ui-sref="challenge_view({id:1})">Challenge</a></li>
+        <li><a ui-sref="challenge_create">Create</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right" ng-show="user">
         <li><a class="navbar-profile" ui-sref="user"><img ng-src="{{user.profile_image}}" style="height:50px;"></a></li>
@@ -44,7 +44,6 @@
 
 </div>
 <script src="angular/client/challengerApp/challenge/challenge.js"></script>
-<script src="angular/client/challengerApp/completed/completed.js"></script>
 <script src="angular/client/challengerApp/create/create.js"></script>
 <script src="angular/client/challengerApp/services/services.js"></script>
 <script src="angular/client/challengerApp/user/user.js"></script>
