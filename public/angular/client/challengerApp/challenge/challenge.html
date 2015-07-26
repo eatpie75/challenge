@@ -3,7 +3,7 @@
   <button type="button" class="btn btn-danger" ng-hide="!started||complete" ng-click="challengeComplete()">Complete challenge with no winner</button>
 </div>
 
-<div class="challenge-participant-container" ng-show="isParticipant&&!hasAccepted&&user.id!==creator.id">
+<div class="challenge-participant-container" ng-show="isParticipant&&!hasAccepted&&user.id!==creator.id&&!started">
   <button type="button" class="btn btn-success" ng-click="challengeAccept()">Accept challenge</button>
   <!-- <button type="button" class="btn btn-danger" ng-click="challengeComplete()">Deny challenge</button> -->
 </div>
