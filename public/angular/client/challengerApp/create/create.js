@@ -16,7 +16,7 @@ angular.module('challengeApp.createChallenge', [])
 
   $scope.addParticipant = function() {
     if ($scope.challengeInfo.participants.indexOf($scope.selectedParticipant.id) === -1) {
-      $scope.challengeInfo.participants.push($scope.selectedParticipant.id);
+      $scope.challengeInfo.participants.push($scope.selectedParticipant);
     }
   };
 

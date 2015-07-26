@@ -1,17 +1,29 @@
 <div id='container'>
-  <form novalidate class="simple-form">
-    Title: <input type="text" ng-model="challengeInfo.title" /><br/>
-    Description: <input type="text" ng-model="challengeInfo.message" /><br/>
-    <label>Who do you want to challenge?</label>
-    <select ng-model="selectedParticipant" ng-options="user.first_name+' '+user.last_name for user in allUsers">
-      <option value="">-----</option>
-    </select>
-    <button type="button" class="btn btn-success" ng-click="addParticipant()">Add</button>
-    <br/>
-    Wager: <input type="text" ng-model="challengeInfo.wager" /><br/>
-
-    <pre>{{challengeInfo | json}}</pre>
-
-    <input type="submit" ng-click="postChallenge()" value="Create Challenge" />
+  <form novalidate>
+    <div class="form-group">
+      <label for="challenge-title">Title:</label>
+      <input class="form-control" type="text" id="challenge-title" ng-model="challengeInfo.title">
+    </div>
+    <div class="form-group">
+      <label for="challenge-message">Description:</label>
+      <input class="form-control" type="text" id="challenge-message" ng-model="challengeInfo.message">
+    </div>
+    <div class="form-group">
+      <label for="participant-select">Add participants:</label>
+      <select class="form-control" ng-model="selectedParticipant" ng-options="user.first_name+' '+user.last_name for user in allUsers">
+        <option value="">-----</option>
+      </select>
+      <button type="button" class="btn btn-success" ng-click="addParticipant()">Add</button>
+      <div class="participant-list">
+        <div class="participant-list-item" ng-repeat="participant in challengeInfo.participants">
+          {{participant.first_name}} {{participant.last_name}}
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="challenge-wager">Wager:</label>
+      <input class="form-control" type="text" id="challenge-wager" ng-model="challengeInfo.wager">
+    </div>
+    <button type="button" class="btn btn-success" ng-click="postChallenge()">Create Challenge</button>
   </form>
 </div>
