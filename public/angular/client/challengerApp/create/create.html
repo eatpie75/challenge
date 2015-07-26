@@ -2,13 +2,16 @@
   <form novalidate class="simple-form">
     Title: <input type="text" ng-model="challengeInfo.title" /><br/>
     Description: <input type="text" ng-model="challengeInfo.message" /><br/>
-    <label>Who do you want to challenge?
-      <select ng-model="challengeInfo.challengee" ng-options="user.full_name for user in allUsers"></select>
-    </label><br/>
+    <label>Who do you want to challenge?</label>
+    <select ng-model="selectedParticipant" ng-options="user.full_name for user in allUsers">
+      <option value="">-----</option>
+    </select>
+    <button type="button" class="btn btn-success" ng-click="addParticipant()">Add</button>
+    <br/>
     Wager: <input type="text" ng-model="challengeInfo.wager" /><br/>
 
     <pre>{{challengeInfo | json}}</pre>
 
-    <input type="submit" ng-click="postChallenge(challengeInfo)" value="Create Challenge" />
+    <input type="submit" ng-click="postChallenge()" value="Create Challenge" />
   </form>
 </div>
