@@ -4,7 +4,7 @@
       <td><a ui-sref='challenge_view({id:challenge.id})'>{{challenge.title}}</a></td>
       <td class='challenge-participant-list'>
         <a ng-repeat='participant in challenge.participants' ui-sref='user({userId:participant.id})'>
-          <img ng-src='{{participant.profile_image}}' title='{{participant.first_name}} {{participant.last_name}}' ng-class='{"not-accepted":!participant.accepted}'> 
+          <img ng-src='{{participant.profile_image}}' title='{{participant.first_name}} {{participant.last_name}}' ng-class='{fade:!participant.accepted}'> 
         </a>
       </td>
     </tr>

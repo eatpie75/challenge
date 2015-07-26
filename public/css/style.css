@@ -2,10 +2,10 @@
   padding-top: 0;
   padding-bottom: 0;
 }
-
 .navbar-nav.navbar-right, .navbar-nav.navbar-right:last-child {
   margin-right: 0;
 }
+
 
 .challenge-participant-list {
   width: 25%;
@@ -16,17 +16,27 @@
 .challenge-participant-list img {
   height: 20px;
 }
-.challenge-participant-list .not-accepted {
+.fade {
   opacity: 0.5;
 }
+
+
+.challenge-details .challenge-creator {
+  width: 120px;
+}
+.challenge-details .challenge-creator img {
   height: 40px;
 }
 
-.challenge-participants-item > img {
-  height: 50px;
+.challenge-title .glyphicon-off {
+  vertical-align: text-top;
 }
 
-.challenge-participants-item > span {
+.challenge-participants-item img {
+  height: 50px;
+}
+.challenge-participants-item span {
   font-size: 2em;
   cursor: pointer;
+  vertical-align: middle;
 }

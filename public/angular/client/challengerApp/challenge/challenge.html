@@ -21,7 +21,7 @@
         HOT STATS
       </span>
     </div>
-    <h1 class="challengeTitle">{{ challengeData.title }}</h1>
+    <h1 class="challenge-title"><span class="glyphicon glyphicon-off" ng-class="{'text-danger':!started,'text-success':started}"></span>{{ challengeData.title }}</h1>
     <p class="lead challengeDescription">{{ challengeData.message }}</p>
     <p class="text-danger" ng-show="complete&&winner===null">NOBODY WINS</p>
     <p class="text-success" ng-show="complete&&winner!==null">
@@ -29,10 +29,11 @@
     </p>
   </div>
   <div class="challenge-participants">
-    <div class="challenge-participants-item" ng-repeat="participant in challengeData.participants">
+    <div class="challenge-participants-item" ng-repeat="participant in challengeData.participants" ng-class="{fade:!participant.accepted,'text-success':participant.id===winner.id}">
       <img ng-src="{{participant.profile_image}}" title="{{participant.first_name}} {{participant.last_name}}">
+      <span>{{participant.first_name}} {{participant.last_name}}</span>
       <span class="glyphicon glyphicon-sunglasses text-muted" title="Declare them the winner"
-      ng-hide="!started||complete" ng-click="challengeComplete(participant.id)">
+      ng-hide="user.id!==creator.id||!started||complete||!participant.accepted" ng-click="challengeComplete(participant.id)">
       </span>
     </div>
   </div>
