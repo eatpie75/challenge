@@ -46,4 +46,14 @@ angular.module('challengeApp.challenge', [])
       $scope.getChallengeInfo($stateParams.id);
     });
   };
+}).controller('ChallengeListController', function ($scope, ChallengeFactory) {
+  $scope.challenges = [];
+
+  $scope.getChallengeList = function() {
+    ChallengeFactory.getChallengeList().then(function(challenges) {
+      $scope.challenges = challenges;
+    });
+  };
+  $scope.getChallengeList();
 });
+

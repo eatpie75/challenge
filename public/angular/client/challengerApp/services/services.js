@@ -71,13 +71,23 @@ angular.module('challengeApp.services', [])
     });
   };
 
+  var getChallengeList = function() {
+    return $http({
+      method: 'GET',
+      url: '/api/1/challenge/public'
+    }).then(function(resp) {
+      return resp.data;
+    });
+  };
+
 
   return {
     getChallengeInfo: getChallengeInfo,
     acceptChallenge: acceptChallenge,
     challengeStart: challengeStart,
     challengeComplete: challengeComplete,
-    getUserChallenges: getUserChallenges
+    getUserChallenges: getUserChallenges,
+    getChallengeList: getChallengeList
   };
 })
 
