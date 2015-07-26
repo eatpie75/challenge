@@ -10,14 +10,15 @@
 .challenge-participant-list {
   width: 25%;
 }
-.challenge-participant-list > a {
+.challenge-participant-list a {
   text-decoration: none;
 }
-.challenge-participant-list > a > img {
+.challenge-participant-list img {
   height: 20px;
 }
-
-.challenge-details .challenge-creator > img {
+.challenge-participant-list .not-accepted {
+  opacity: 0.5;
+}
   height: 40px;
 }
 
