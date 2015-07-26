@@ -8,6 +8,7 @@ angular.module('challengeApp.challenge', [])
   $scope.complete=false;
   $scope.winner=null;
 
+  $scope.canBeStarted = false;
   $scope.isParticipant = false;
   $scope.hasAccepted = false;
   
@@ -20,6 +21,9 @@ angular.module('challengeApp.challenge', [])
 
       $scope.started = res.started;
       $scope.complete = res.complete;
+      $scope.canBeStarted = res.participants.reduce(function(num, participant) {
+          return (participant.accepted) ? num++ : num;
+      }, 0) > 1;
 
       if ($scope.user !== null) {
         $scope.isParticipant = res.participants.some(function(participant) {return participant.id === $scope.user.id;});

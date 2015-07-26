@@ -1,5 +1,5 @@
 <div class="challenge-creator-container" ng-show="user.id===creator.id">
-  <button type="button" class="btn btn-default" ng-hide="started" ng-click="challengeStart()">Start challenge</button>
+  <button type="button" class="btn btn-default" ng-hide="started||!canBeStarted" ng-click="challengeStart()">Start challenge</button>
   <button type="button" class="btn btn-danger" ng-hide="!started||complete" ng-click="challengeComplete()">Complete challenge with no winner</button>
 </div>
 
