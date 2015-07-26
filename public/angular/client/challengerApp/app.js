@@ -37,7 +37,7 @@ angular.module('challengeApp', [
 
     .state('user', {
       url: '/user',
-      templateUrl: 'angular/client/challengerApp/user/index.html',
+      templateUrl: 'angular/client/challengerApp/user/user.html',
       controller: 'UserChallengesController'
     });
 
