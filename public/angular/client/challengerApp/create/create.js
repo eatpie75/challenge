@@ -9,10 +9,9 @@ angular.module('challengeApp.createChallenge', [])
 
   // get array of all users in the database
   CreateChallengeFactory.getAllUsers().then(function(res){
-    angular.forEach(res, function(user){
-      user.full_name = user.first_name+' '+user.last_name;
+    $scope.allUsers = res.filter(function(user) {
+      return (user.id !== $scope.user.id);
     });
-    $scope.allUsers = res;
   });
 
   $scope.addParticipant = function() {

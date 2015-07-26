@@ -3,7 +3,7 @@
     Title: <input type="text" ng-model="challengeInfo.title" /><br/>
     Description: <input type="text" ng-model="challengeInfo.message" /><br/>
     <label>Who do you want to challenge?</label>
-    <select ng-model="selectedParticipant" ng-options="user.full_name for user in allUsers">
+    <select ng-model="selectedParticipant" ng-options="user.first_name+' '+user.last_name for user in allUsers">
       <option value="">-----</option>
     </select>
     <button type="button" class="btn btn-success" ng-click="addParticipant()">Add</button>
