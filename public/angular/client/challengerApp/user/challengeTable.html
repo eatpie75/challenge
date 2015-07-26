@@ -1,5 +1,5 @@
   <table class='table table-bordered challenge-table'>
-    <caption>{{caption}}</caption>
+    <caption ng-show="caption">{{caption}}</caption>
     <tr ng-repeat='challenge in challenges|challengeFilter:accepted:started:complete:user' class='challenge-row'>
       <td><a ui-sref='challenge_view({id:challenge.id})'>{{challenge.title}}</a></td>
       <td class='challenge-participant-list'>
