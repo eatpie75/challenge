@@ -67,9 +67,9 @@ angular.module('challengeApp', [
 }).filter('challengeFilter', function() {
   return function(input, accepted, started, complete, user) {
     user = (user !== undefined) ? parseInt(user) : undefined;
-    accepted = (accepted !== undefined && user !==undefined) ? !!parseInt(accepted) : null;
+    accepted = (accepted !== undefined && user !== undefined) ? !!parseInt(accepted) : null;
     started = (started !== undefined) ? !!parseInt(started) : null;
-    complete = (complete !== undefined) ? !!parseInt(complete): null;
+    complete = (complete !== undefined) ? !!parseInt(complete) : null;
 
     return input.filter(function(challenge) {
       var has_accepted = true;

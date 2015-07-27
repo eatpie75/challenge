@@ -1,7 +1,7 @@
 angular.module('challengeApp.createChallenge', [])
 
 .controller('CreateChallengeController', function ($scope, $state, CreateChallengeFactory) {
-  
+
   $scope.allUsers = [];
   $scope.challengeInfo = {};
   $scope.challengeInfo.participants = [];

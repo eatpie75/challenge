@@ -1,7 +1,7 @@
 angular.module('challengeApp.challenge', [])
 
 .controller('ChallengeController', function ($scope, ChallengeFactory, $stateParams) {
-  
+
   $scope.challengeData = {};
   $scope.creator=null;
   $scope.started=false;
@@ -11,7 +11,7 @@ angular.module('challengeApp.challenge', [])
   $scope.canBeStarted = false;
   $scope.isParticipant = false;
   $scope.hasAccepted = false;
-  
+
   $scope.getChallengeInfo = function(id){
     ChallengeFactory.getChallengeInfo(id).then(function(res){
       $scope.challengeData = res;
